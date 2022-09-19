@@ -14,8 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
+const convert_hour_string_to_minutes_1 = require("./utils/convert-hour-string-to-minutes");
+const convert_minutes_to_hour_string_1 = require("./utils/convert-minutes-to-hour-string");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-app.use(express_1.default.json);
+app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 const prisma = new client_1.PrismaClient();
 app.get('/games', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const games = yield prisma.game.findMany({
@@ -49,7 +53,7 @@ app.get('/games/:id/ads', (request, response) => __awaiter(void 0, void 0, void 
         }
     });
     return response.json(ads.map(ad => {
-        return Object.assign(Object.assign({}, ad), { weekDays: ad.weekDays.split(',') });
+        return Object.assign(Object.assign({}, ad), { weekDays: ad.weekDays.split(','), hourStart: (0, convert_minutes_to_hour_string_1.convertMinutesToHourString)(ad.hourStart), hourEnd: (0, convert_minutes_to_hour_string_1.convertMinutesToHourString)(ad.hourEnd) });
     }));
 }));
 app.get('/ads/:id/discord', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
@@ -70,7 +74,22 @@ app.get('/ads/:id/discord', (request, response) => __awaiter(void 0, void 0, voi
         discord: ad.discord
     });
 }));
-app.post('/games/:id/ads', (request, response) => {
-    return response.json(request.body);
-});
+app.post('/games/:id/ads', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const gameId = request.params.id;
+    const body = request.body;
+    const ad = yield prisma.ad.create({
+        data: {
+            gameId,
+            name: body.name,
+            yearsPlaying: body.yearsPlaying,
+            discord: body.discord,
+            weekDays: body.weekDays.join(','),
+            hourStart: (0, convert_hour_string_to_minutes_1.convertHourStringToMinutes)(body.hourStart),
+            hourEnd: (0, convert_hour_string_to_minutes_1.convertHourStringToMinutes)(body.hourEnd),
+            useVoiceChannel: body.useVoiceChannel,
+            createdAt: body.createdAt
+        }
+    });
+    return response.json(ad);
+}));
 app.listen(3333);
