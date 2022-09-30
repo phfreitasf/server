@@ -6,3 +6,5 @@ node_modules
 /certificate.crt
 /private.key
 /src/database/db.sqlite
+/.env.dev
+/prisma/migrations
