@@ -28,3 +28,18 @@ model Ad {
 
   game Game @relation(fields: [gameId], references: [id])
 }
+
+model DiscordUserSchema {
+  discordId     String    @id
+  name          String
+  access_token  String
+  refresh_token String
+  createdAt     DateTime? @default(now())
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}

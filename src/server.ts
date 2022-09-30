@@ -2,8 +2,6 @@ import { httpPort, httpsPort } from './serverConfig/appExpress'
 import { httpsServer } from './serverConfig/https';
 import { httpServer } from './serverConfig/http';
 
-
-
 httpServer.listen(httpPort)
 httpsServer.listen(httpsPort)
 

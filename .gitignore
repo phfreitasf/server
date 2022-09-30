@@ -2,9 +2,8 @@ node_modules
 # Keep environment variables out of version control
 .env
 /build
-/.env
 /certificate.crt
 /private.key
 /src/database/db.sqlite
+/.env
 /.env.dev
-/prisma/migrations
